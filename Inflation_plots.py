@@ -8,7 +8,7 @@ import matplotlib.dates as mdates
 pay_classes = ["APS4.4", "APS5.4", "APS6.5", "EL1.5", "EL2.6"]
 df = pd.read_excel('inflation_tables.xlsx', index_col='Pay Date')
 df.index = pd.to_datetime(df.index)
-index_dict = {'SLCI': 'Monthly SLCI', 'CPI': 'Monthly CPI'}
+index_dict = {'SLCI': 'Fortnightly SLCI', 'CPI': 'Fortnightly CPI'}
 
 
 # Process CPI and SLCI
@@ -19,17 +19,17 @@ for inflation_index in index_dict.keys():
     for pay_level in pay_classes:
 
         # Starting value
-        start_value = df[f"{pay_level} Monthly Pay"].iloc[0]
+        start_value = df[f"{pay_level} Fortnightly Pay"].iloc[0]
 
         # the values to multiply pay by (1.XXXX)
         multiplier = 1 + df[index_dict[inflation_index]] / 100
 
         # Calculate compounded column
-        df[f"{pay_level} Monthly Pay with " + inflation_index] = start_value * multiplier.cumprod()
+        df[f"{pay_level} Fortnightly Pay with " + inflation_index] = start_value * multiplier.cumprod()
 
         # difference between inflation adjusted and actual pay
         df[f"{pay_level} Difference"] = (
-            df[f"{pay_level} Monthly Pay with " + inflation_index] - df[f"{pay_level} Monthly Pay"]
+            df[f"{pay_level} Fortnightly Pay with " + inflation_index] - df[f"{pay_level} Fortnightly Pay"]
         )
 
         #cumulative difference
@@ -45,10 +45,10 @@ for inflation_index in index_dict.keys():
         a.set_xlim(xmin, xmax)
 
     for pay_level, ax in zip(pay_classes, axes.ravel()):
-        df[f"{pay_level} Monthly Pay with " + inflation_index].plot(
+        df[f"{pay_level} Fortnightly Pay with " + inflation_index].plot(
             ax=ax, label=f"Inflation adjusted ({inflation_index})"
         )
-        df[f"{pay_level} Monthly Pay"].plot(
+        df[f"{pay_level} Fortnightly Pay"].plot(
             ax=ax, label="Actual pay"
         )
 
@@ -58,7 +58,7 @@ for inflation_index in index_dict.keys():
         ax.set_xlabel('Year')
 
         ax.yaxis.set_major_formatter(mtick.StrMethodFormatter('${x:,.0f}'))
-        ax.set_ylabel('Gross Monthly Pay ($)')
+        ax.set_ylabel('Gross Fortnightly Pay ($)')
         ax.grid(alpha=0.5)
         ax.set_title(pay_level, fontsize=14)
 
